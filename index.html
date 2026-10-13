@@ -1,1 +1,414 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Alimento</title></head><body><h1>Alimento</h1><p>Página en construcción.</p></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Comidas">
+<meta name="theme-color" content="#EAF2EC">
+<title>Comidas del perro</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐶</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EAF2EC;
+    --card: #FFFFFF;
+    --ink: #1E2B24;
+    --muted: #5C6B62;
+    --line: #C9D8CE;
+    --done: #2F8F5B;
+    --done-soft: #DDF1E4;
+    --med: #F4B740;
+    --med-soft: #FFF3D6;
+    --med-ink: #6B4A00;
+    --danger: #C2412D;
+    --next: #3B7DD8;
+ 
+    --font-body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-title: "Fredoka", "Atkinson Hyperlegible", -apple-system, "Segoe UI", sans-serif;
+ 
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+ 
+  .app {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 24px max(28px, env(safe-area-inset-right, 0px)) 24px max(28px, env(safe-area-inset-left, 0px));
+  }
+ 
+  /* Encabezado */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .brand svg { width: 64px; height: 64px; flex: none; }
+  h1 {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 2.6rem;
+    line-height: 1.05;
+    margin: 0;
+  }
+  .today { margin: 4px 0 0; font-size: 1.45rem; color: var(--muted); }
+  .today::first-letter { text-transform: uppercase; }
+ 
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .dots { display: flex; gap: 8px; }
+  .dots span {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 3px solid var(--line);
+    background: var(--card);
+    transition: background .25s, border-color .25s;
+  }
+  .dots span.on { background: var(--done); border-color: var(--done); }
+ 
+  /* Comidas */
+  .meals {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .meal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    gap: 14px;
+    width: 100%;
+    min-height: 100%;
+    padding: 24px 22px 22px;
+    background: var(--card);
+    color: inherit;
+    font: inherit;
+    border: 4px solid transparent;
+    border-radius: 28px;
+    box-shadow: 0 2px 0 var(--line);
+    cursor: pointer;
+    transition: background .25s, border-color .25s, transform .1s;
+  }
+  .meal:active { transform: scale(.98); }
+  .meal:focus-visible { outline: 5px solid var(--next); outline-offset: 4px; }
+  .meal.is-next { border-color: var(--next); }
+ 
+  .next-tag {
+    display: none;
+    align-self: flex-start;
+    background: var(--next);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+  .meal.is-next .next-tag { display: inline-block; }
+ 
+  .time { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .time b {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 4rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .time small { font-size: 1.35rem; color: var(--muted); }
+ 
+  .name { font-size: 1.4rem; color: var(--muted); margin: 0; }
+  .portion { font-size: 1.9rem; font-weight: 700; line-height: 1.2; margin: 0; }
+ 
+  .med {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--med-soft);
+    color: var(--med-ink);
+    border: 3px solid var(--med);
+    border-radius: 18px;
+    padding: 12px 14px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .med svg { width: 38px; height: 38px; flex: none; }
+  .no-med { font-size: 1.3rem; color: var(--muted); padding: 12px 0; }
+ 
+  .check-row {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 3px dashed var(--line);
+  }
+  .box {
+    flex: none;
+    width: 92px; height: 92px;
+    border-radius: 22px;
+    border: 5px solid #9BB3A4;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    transition: background .2s, border-color .2s;
+  }
+  .box svg { width: 62px; height: 62px; opacity: 0; transform: scale(.4); transition: opacity .2s, transform .25s cubic-bezier(.3,1.6,.5,1); }
+  .status { font-size: 1.45rem; font-weight: 700; line-height: 1.2; }
+  .status small { display: block; font-weight: 400; color: var(--muted); font-size: 1.2rem; margin-top: 4px; }
+ 
+  .meal.done { background: var(--done-soft); border-color: var(--done); }
+  .meal.done .box { background: var(--done); border-color: var(--done); }
+  .meal.done .box svg { opacity: 1; transform: scale(1); }
+  .meal.done .status { color: var(--done); }
+  .meal.done .status small { color: var(--ink); }
+ 
+  /* Pie */
+  footer { display: flex; justify-content: flex-end; }
+  .btn {
+    font: inherit;
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-height: 76px;
+    padding: 0 34px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn:focus-visible { outline: 5px solid var(--next); outline-offset: 3px; }
+  .btn svg { width: 34px; height: 34px; }
+  .btn-reset { background: var(--card); color: var(--danger); border: 4px solid var(--danger); }
+  .btn-reset:active { background: #FCE9E5; }
+ 
+  /* Confirmación */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(30, 43, 36, .45);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    z-index: 10;
+  }
+  .overlay.open { display: flex; }
+  .dialog {
+    background: var(--card);
+    border-radius: 32px;
+    padding: 40px 44px;
+    width: min(640px, 100%);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    animation: pop .2s ease-out;
+  }
+  @keyframes pop { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+  .dialog h2 { font-family: var(--font-title); font-weight: 600; font-size: 2.3rem; margin: 0 0 12px; }
+  .dialog p { font-size: 1.5rem; color: var(--muted); margin: 0 0 32px; line-height: 1.4; }
+  .dialog-actions { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+  .btn-cancel { background: var(--card); color: var(--ink); border: 4px solid var(--line); }
+  .btn-confirm { background: var(--danger); color: #fff; border: 4px solid var(--danger); }
+  .dialog-actions .btn { flex: 1 1 220px; justify-content: center; }
+ 
+  /* Pantallas más chicas o vertical */
+  @media (max-width: 1050px) and (orientation: landscape) {
+    .time b { font-size: 3.3rem; }
+    .portion { font-size: 1.6rem; }
+    .med { font-size: 1.2rem; }
+    .box { width: 80px; height: 80px; }
+  }
+  @media (orientation: portrait), (max-width: 860px) {
+    .meals { grid-template-columns: repeat(2, 1fr); }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 560px) {
+    .meals { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+    .brand svg { width: 48px; height: 48px; }
+    footer { justify-content: stretch; }
+    footer .btn { width: 100%; justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="32" fill="#2F8F5B"/>
+        <g fill="#fff">
+          <ellipse cx="32" cy="40" rx="11" ry="9"/>
+          <ellipse cx="19" cy="29" rx="4.6" ry="6"/>
+          <ellipse cx="45" cy="29" rx="4.6" ry="6"/>
+          <ellipse cx="26" cy="19" rx="4.4" ry="6"/>
+          <ellipse cx="38" cy="19" rx="4.4" ry="6"/>
+        </g>
+      </svg>
+      <div>
+        <h1>Comidas del perro</h1>
+        <p class="today" id="today"></p>
+      </div>
+    </div>
+    <div class="progress" aria-live="polite">
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <span id="progressText"></span>
+    </div>
+  </header>
+ 
+  <ul class="meals" id="meals"></ul>
+ 
+  <footer>
+    <button class="btn btn-reset" id="resetBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      Reiniciar comidas
+    </button>
+  </footer>
+</div>
+ 
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+  <div class="dialog">
+    <h2 id="dlgTitle">¿Reiniciar las comidas?</h2>
+    <p>Se van a desmarcar todas las comidas para empezar un día nuevo.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-cancel" id="cancelBtn" type="button">No, volver</button>
+      <button class="btn btn-confirm" id="confirmBtn" type="button">Sí, reiniciar</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  // ===== Para cambiar comidas u horarios, editá esta lista =====
+  const MEALS = [
+    { id: "m1", time: "8:00",  period: "de la mañana", name: "Primera comida", portion: "Ración pequeña", med: "1 pastilla de Ursomarina" },
+    { id: "m2", time: "11:00", period: "de la mañana", name: "Segunda comida", portion: "Ración normal",  med: "4 gotas de Omega 3" },
+    { id: "m3", time: "3:00",  period: "de la tarde",  name: "Tercera comida", portion: "Ración normal",  med: null },
+    { id: "m4", time: "6:00",  period: "de la tarde",  name: "Cuarta comida",  portion: "Ración normal",  med: null }
+  ];
+ 
+  const STORAGE_KEY = "comidas-perro-v1";
+  let state = {};
+ 
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      state = raw ? JSON.parse(raw) || {} : {};
+    } catch (e) { state = {}; }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+ 
+  const pillIcon = '<svg viewBox="0 0 40 40" aria-hidden="true"><g transform="rotate(-40 20 20)"><rect x="5" y="13" width="30" height="14" rx="7" fill="#fff" stroke="#C98A00" stroke-width="2.5"/><path d="M20 13h8a7 7 0 0 1 0 14h-8z" fill="#F4B740" stroke="#C98A00" stroke-width="2.5"/></g></svg>';
+  const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11"/></svg>';
+ 
+  function fmtTime(ts) {
+    return new Date(ts).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+  }
+ 
+  function render() {
+    const list = document.getElementById("meals");
+    list.innerHTML = "";
+    const nextId = (MEALS.find(m => !state[m.id]) || {}).id;
+ 
+    MEALS.forEach(m => {
+      const done = !!state[m.id];
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button type="button" class="meal${done ? " done" : ""}${m.id === nextId ? " is-next" : ""}"
+                aria-pressed="${done}" data-id="${m.id}">
+          <span class="next-tag">Siguiente</span>
+          <span class="time"><b>${m.time}</b><small>${m.period}</small></span>
+          <div>
+            <p class="name">${m.name}</p>
+            <p class="portion">${m.portion}</p>
+          </div>
+          ${m.med
+            ? `<span class="med">${pillIcon}<span>${m.med}</span></span>`
+            : `<span class="no-med">Sin medicación</span>`}
+          <span class="check-row">
+            <span class="box">${checkIcon}</span>
+            <span class="status">${done
+              ? `¡Listo!<small>Dada a las ${fmtTime(state[m.id])}</small>`
+              : `Tocar al dar la comida`}</span>
+          </span>
+        </button>`;
+      list.appendChild(li);
+    });
+ 
+    const count = MEALS.filter(m => state[m.id]).length;
+    document.getElementById("dots").innerHTML =
+      MEALS.map(m => `<span class="${state[m.id] ? "on" : ""}"></span>`).join("");
+    document.getElementById("progressText").textContent =
+      count === MEALS.length ? "¡Todas dadas!" : `${count} de ${MEALS.length} dadas`;
+  }
+ 
+  document.getElementById("meals").addEventListener("click", e => {
+    const btn = e.target.closest(".meal");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (state[id]) delete state[id]; else state[id] = Date.now();
+    save();
+    render();
+  });
+ 
+  // Reinicio con confirmación
+  const overlay = document.getElementById("overlay");
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    overlay.classList.add("open");
+    document.getElementById("cancelBtn").focus();
+  });
+  function closeDialog() { overlay.classList.remove("open"); }
+  document.getElementById("cancelBtn").addEventListener("click", closeDialog);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeDialog(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeDialog(); });
+  document.getElementById("confirmBtn").addEventListener("click", () => {
+    state = {};
+    save();
+    render();
+    closeDialog();
+  });
+ 
+  // Fecha de hoy
+  function showDate() {
+    document.getElementById("today").textContent =
+      new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+  }
+ 
+  load();
+  showDate();
+  render();
+  setInterval(showDate, 60000);
+</script>
+</body>
+</html>
