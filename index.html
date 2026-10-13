@@ -30,15 +30,19 @@
     --font-body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     --font-title: "Fredoka", "Atkinson Hyperlegible", -apple-system, "Segoe UI", sans-serif;
  
+    /* Unidad de alto: usa el alto visible real en iPad/iPhone cuando está disponible */
+    --vh: 1vh;
+ 
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   *, *::before, *::after { box-sizing: inherit; }
+  @supports (height: 1dvh) { :root { --vh: 1dvh; } }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
   body {
     margin: 0;
-    min-height: 100%;
+    height: 100%;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
@@ -46,12 +50,15 @@
     -webkit-text-size-adjust: 100%;
   }
  
+  /* La app ocupa exactamente el alto de la pantalla; por debajo de 560px de alto
+     deja de achicarse y la página pasa a tener scroll */
   .app {
-    min-height: 100%;
+    height: 100%;
+    min-height: 560px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
-    padding: 24px max(28px, env(safe-area-inset-right, 0px)) 24px max(28px, env(safe-area-inset-left, 0px));
+    gap: clamp(10px, calc(var(--vh) * 2.9), 22px);
+    padding: clamp(12px, calc(var(--vh) * 3.2), 24px) max(28px, env(safe-area-inset-right, 0px)) clamp(12px, calc(var(--vh) * 3.2), 24px) max(28px, env(safe-area-inset-left, 0px));
   }
  
   /* Encabezado */
@@ -62,28 +69,28 @@
     gap: 24px;
   }
   .brand { display: flex; align-items: center; gap: 18px; }
-  .brand svg { width: 64px; height: 64px; flex: none; }
+  .brand svg { width: clamp(44px, calc(var(--vh) * 8.4), 64px); height: clamp(44px, calc(var(--vh) * 8.4), 64px); flex: none; }
   h1 {
     font-family: var(--font-title);
     font-weight: 600;
-    font-size: 2.6rem;
+    font-size: clamp(1.8rem, calc(var(--vh) * 5.5), 2.6rem);
     line-height: 1.05;
     margin: 0;
   }
-  .today { margin: 4px 0 0; font-size: 1.45rem; color: var(--muted); }
+  .today { margin: 4px 0 0; font-size: clamp(1.1rem, calc(var(--vh) * 3), 1.45rem); color: var(--muted); }
   .today::first-letter { text-transform: uppercase; }
  
   .progress {
     display: flex;
     align-items: center;
     gap: 16px;
-    font-size: 1.6rem;
+    font-size: clamp(1.25rem, calc(var(--vh) * 3.4), 1.6rem);
     font-weight: 700;
     white-space: nowrap;
   }
   .dots { display: flex; gap: 8px; }
   .dots span {
-    width: 26px; height: 26px; border-radius: 50%;
+    width: clamp(20px, calc(var(--vh) * 3.4), 26px); height: clamp(20px, calc(var(--vh) * 3.4), 26px); border-radius: 50%;
     border: 3px solid var(--line);
     background: var(--card);
     transition: background .25s, border-color .25s;
@@ -93,8 +100,10 @@
   /* Comidas */
   .meals {
     flex: 1;
+    min-height: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
     gap: 18px;
     margin: 0;
     padding: 0;
@@ -106,10 +115,10 @@
     flex-direction: column;
     align-items: stretch;
     text-align: left;
-    gap: 14px;
+    gap: clamp(6px, calc(var(--vh) * 1.8), 14px);
     width: 100%;
-    min-height: 100%;
-    padding: 24px 22px 22px;
+    height: 100%;
+    padding: clamp(12px, calc(var(--vh) * 3.2), 24px) 22px clamp(12px, calc(var(--vh) * 2.9), 22px);
     background: var(--card);
     color: inherit;
     font: inherit;
@@ -128,9 +137,9 @@
     align-self: flex-start;
     background: var(--next);
     color: #fff;
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, calc(var(--vh) * 2.4), 1.15rem);
     font-weight: 700;
-    padding: 6px 14px;
+    padding: clamp(3px, calc(var(--vh) * 0.8), 6px) 14px;
     border-radius: 999px;
   }
   .meal.is-next .next-tag { display: inline-block; }
@@ -139,14 +148,14 @@
   .time b {
     font-family: var(--font-title);
     font-weight: 600;
-    font-size: 4rem;
+    font-size: clamp(2.6rem, calc(var(--vh) * 8.4), 4rem);
     line-height: 1;
     letter-spacing: -0.01em;
   }
-  .time small { font-size: 1.35rem; color: var(--muted); }
+  .time small { font-size: clamp(1.05rem, calc(var(--vh) * 2.8), 1.35rem); color: var(--muted); }
  
-  .name { font-size: 1.4rem; color: var(--muted); margin: 0; }
-  .portion { font-size: 1.9rem; font-weight: 700; line-height: 1.2; margin: 0; }
+  .name { font-size: clamp(1.1rem, calc(var(--vh) * 2.95), 1.4rem); color: var(--muted); margin: 0; }
+  .portion { font-size: clamp(1.35rem, calc(var(--vh) * 4), 1.9rem); font-weight: 700; line-height: 1.2; margin: 0; }
  
   .med {
     display: flex;
@@ -156,25 +165,25 @@
     color: var(--med-ink);
     border: 3px solid var(--med);
     border-radius: 18px;
-    padding: 12px 14px;
-    font-size: 1.4rem;
+    padding: clamp(6px, calc(var(--vh) * 1.6), 12px) 14px;
+    font-size: clamp(1.1rem, calc(var(--vh) * 2.95), 1.4rem);
     font-weight: 700;
     line-height: 1.25;
   }
-  .med svg { width: 38px; height: 38px; flex: none; }
-  .no-med { font-size: 1.3rem; color: var(--muted); padding: 12px 0; }
+  .med svg { width: clamp(28px, calc(var(--vh) * 5), 38px); height: clamp(28px, calc(var(--vh) * 5), 38px); flex: none; }
+  .no-med { font-size: clamp(1.05rem, calc(var(--vh) * 2.8), 1.3rem); color: var(--muted); padding: clamp(6px, calc(var(--vh) * 1.6), 12px) 0; }
  
   .check-row {
     margin-top: auto;
     display: flex;
     align-items: center;
     gap: 16px;
-    padding-top: 16px;
+    padding-top: clamp(8px, calc(var(--vh) * 2.1), 16px);
     border-top: 3px dashed var(--line);
   }
   .box {
     flex: none;
-    width: 92px; height: 92px;
+    width: clamp(64px, calc(var(--vh) * 12), 92px); height: clamp(64px, calc(var(--vh) * 12), 92px);
     border-radius: 22px;
     border: 5px solid #9BB3A4;
     background: #fff;
@@ -182,9 +191,9 @@
     place-items: center;
     transition: background .2s, border-color .2s;
   }
-  .box svg { width: 62px; height: 62px; opacity: 0; transform: scale(.4); transition: opacity .2s, transform .25s cubic-bezier(.3,1.6,.5,1); }
-  .status { font-size: 1.45rem; font-weight: 700; line-height: 1.2; }
-  .status small { display: block; font-weight: 400; color: var(--muted); font-size: 1.2rem; margin-top: 4px; }
+  .box svg { width: 68%; height: 68%; opacity: 0; transform: scale(.4); transition: opacity .2s, transform .25s cubic-bezier(.3,1.6,.5,1); }
+  .status { font-size: clamp(1.15rem, calc(var(--vh) * 3), 1.45rem); font-weight: 700; line-height: 1.2; }
+  .status small { display: block; font-weight: 400; color: var(--muted); font-size: clamp(1rem, calc(var(--vh) * 2.5), 1.2rem); margin-top: 4px; }
  
   .meal.done { background: var(--done-soft); border-color: var(--done); }
   .meal.done .box { background: var(--done); border-color: var(--done); }
@@ -196,9 +205,9 @@
   footer { display: flex; justify-content: flex-end; }
   .btn {
     font: inherit;
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, calc(var(--vh) * 3.15), 1.5rem);
     font-weight: 700;
-    min-height: 76px;
+    min-height: clamp(56px, calc(var(--vh) * 10), 76px);
     padding: 0 34px;
     border-radius: 20px;
     cursor: pointer;
@@ -207,7 +216,7 @@
     gap: 12px;
   }
   .btn:focus-visible { outline: 5px solid var(--next); outline-offset: 3px; }
-  .btn svg { width: 34px; height: 34px; }
+  .btn svg { width: clamp(26px, calc(var(--vh) * 4.5), 34px); height: clamp(26px, calc(var(--vh) * 4.5), 34px); }
   .btn-reset { background: var(--card); color: var(--danger); border: 4px solid var(--danger); }
   .btn-reset:active { background: #FCE9E5; }
  
@@ -240,13 +249,16 @@
  
   /* Pantallas más chicas o vertical */
   @media (max-width: 1050px) and (orientation: landscape) {
-    .time b { font-size: 3.3rem; }
-    .portion { font-size: 1.6rem; }
-    .med { font-size: 1.2rem; }
-    .box { width: 80px; height: 80px; }
+    .time b { font-size: clamp(2.4rem, calc(var(--vh) * 7), 3.3rem); }
+    .portion { font-size: clamp(1.3rem, calc(var(--vh) * 3.4), 1.6rem); }
+    .med { font-size: clamp(1.05rem, calc(var(--vh) * 2.6), 1.2rem); }
+    .box { width: clamp(60px, calc(var(--vh) * 10.5), 80px); height: clamp(60px, calc(var(--vh) * 10.5), 80px); }
   }
   @media (orientation: portrait), (max-width: 860px) {
-    .meals { grid-template-columns: repeat(2, 1fr); }
+    /* En vertical las tarjetas van en 2 columnas y la página scrollea normalmente */
+    .app { height: auto; min-height: 100%; }
+    .meals { grid-template-columns: repeat(2, 1fr); grid-template-rows: none; }
+    .meal { height: auto; }
     header { flex-direction: column; align-items: flex-start; }
   }
   @media (max-width: 560px) {
@@ -412,3 +424,4 @@
 </script>
 </body>
 </html>
+ 
