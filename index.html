@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Comidas">
+<meta name="apple-mobile-web-app-title" content="Arya">
 <meta name="theme-color" content="#EAF2EC">
 <title>Comidas de Arya</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐶</text></svg>">
@@ -329,16 +329,42 @@
   ];
  
   const STORAGE_KEY = "comidas-perro-v1";
-  let state = {};
+  let state = {};        // comidas marcadas: { m1: horaEnMilisegundos, ... }
+  let stateDay = "";     // día al que corresponden esas marcas
+ 
+  // Fecha local en formato AAAA-MM-DD
+  function dayKey(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
  
   function load() {
+    state = {};
+    stateDay = dayKey();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      state = raw ? JSON.parse(raw) || {} : {};
+      const data = raw ? JSON.parse(raw) : null;
+      if (data && data.marks && data.day === stateDay) {
+        state = data.marks;
+      } else if (data && !data.marks) {
+        // Formato anterior: conserva solo lo marcado hoy
+        for (const id in data) if (dayKey(new Date(data[id])) === stateDay) state[id] = data[id];
+      }
     } catch (e) { state = {}; }
+    save();
   }
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ day: stateDay, marks: state })); } catch (e) {}
+  }
+ 
+  // Si cambió el día desde la última vez, empieza de cero
+  function checkNewDay() {
+    if (dayKey() !== stateDay) {
+      state = {};
+      stateDay = dayKey();
+      save();
+      showDate();
+      render();
+    }
   }
  
   const pillIcon = '<svg viewBox="0 0 40 40" aria-hidden="true"><g transform="rotate(-40 20 20)"><rect x="5" y="13" width="30" height="14" rx="7" fill="#fff" stroke="#C98A00" stroke-width="2.5"/><path d="M20 13h8a7 7 0 0 1 0 14h-8z" fill="#F4B740" stroke="#C98A00" stroke-width="2.5"/></g></svg>';
@@ -389,6 +415,7 @@
   document.getElementById("meals").addEventListener("click", e => {
     const btn = e.target.closest(".meal");
     if (!btn) return;
+    checkNewDay();
     const id = btn.dataset.id;
     if (state[id]) delete state[id]; else state[id] = Date.now();
     save();
@@ -421,7 +448,12 @@
   load();
   showDate();
   render();
-  setInterval(showDate, 60000);
+  // Revisa cada minuto (la página puede quedar abierta varios días)
+  setInterval(() => { showDate(); checkNewDay(); }, 60000);
+  // Y apenas se vuelve a la página después de tenerla en segundo plano o con la pantalla apagada
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { showDate(); checkNewDay(); } });
+  window.addEventListener("pageshow", () => { showDate(); checkNewDay(); });
+  window.addEventListener("focus", () => { showDate(); checkNewDay(); });
 </script>
 </body>
 </html>
